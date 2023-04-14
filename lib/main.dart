@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 void main() {
@@ -12,10 +14,22 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  late Timer timer;
+  int times = 0;
+  String timeString = '00:00:00';
+
+  void changeTime({required int second}) {
+    times += second;
+    setState(() {
+      timeString = Duration(seconds: times).toString().split('.')[0];
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
+        backgroundColor: Colors.black,
         body: Column(
           children: [
             const Flexible(
@@ -23,7 +37,7 @@ class _MyAppState extends State<MyApp> {
                 child: Center(
                   child: Text(
                     'My timer',
-                    style: TextStyle(fontSize: 30),
+                    style: TextStyle(fontSize: 30, color: Colors.white),
                   ),
                 )),
             Flexible(
@@ -31,28 +45,49 @@ class _MyAppState extends State<MyApp> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   crossAxisAlignment: CrossAxisAlignment.center,
-                  children: const [
-                    TimeButton(
-                        icon: Icon(Icons.add_circle_outline),
-                        second: '60',
-                        color: Colors.blue),
-                    TimeButton(
-                        icon: Icon(Icons.add_circle_outline),
-                        second: '30',
-                        color: Colors.blueAccent)
+                  children: [
+                    GestureDetector(
+                      onTap: () => changeTime(second: 60),
+                      child: const TimeButton(
+                          icon: Icon(Icons.add_circle_outline),
+                          second: '60',
+                          color: Colors.blue),
+                    ),
+                    GestureDetector(
+                      onTap: null,
+                      child: const TimeButton(
+                          icon: Icon(Icons.add_circle_outline),
+                          second: '30',
+                          color: Colors.cyan),
+                    ),
+                    GestureDetector(
+                      onTap: null,
+                      child: const TimeButton(
+                          icon: Icon(Icons.remove_circle_outline_rounded),
+                          second: '30',
+                          color: Colors.orange),
+                    ),
+                    GestureDetector(
+                      onTap: null,
+                      child: const TimeButton(
+                          icon: Icon(Icons.remove_circle_outline_rounded),
+                          second: '60',
+                          color: Colors.red),
+                    ),
                   ],
                 )),
             Flexible(
                 flex: 1,
-                child: Container(
+                child: SizedBox(
                     width: double.infinity,
                     height: double.infinity,
-                    decoration: const BoxDecoration(color: Colors.brown),
-                    child: const Center(
+                    child: Center(
                       child: Text(
-                        '00:00:00',
-                        style: TextStyle(
-                            fontSize: 60, fontWeight: FontWeight.bold),
+                        timeString,
+                        style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 60,
+                            fontWeight: FontWeight.bold),
                       ),
                     ))),
             Flexible(
@@ -62,6 +97,7 @@ class _MyAppState extends State<MyApp> {
                   icon: Icon(
                     Icons.play_circle_outline_outlined,
                     size: 40,
+                    color: Colors.pink,
                   )),
             ))
           ],
@@ -85,9 +121,8 @@ class TimeButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
-      decoration:
-          BoxDecoration(color: color, borderRadius: BorderRadius.circular(10)),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
       child: Row(
         children: [icon, Text(second)],
       ),
