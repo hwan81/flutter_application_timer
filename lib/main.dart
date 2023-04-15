@@ -16,12 +16,48 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   late Timer timer;
   int times = 0;
-  String timeString = '00:00:00';
+  String timeString = '0:00:00';
+  bool running = false;
+
+  String timeFormat(int duration) {
+    return Duration(seconds: times).toString().split('.')[0];
+  }
 
   void changeTime({required int second}) {
     times += second;
     setState(() {
-      timeString = Duration(seconds: times).toString().split('.')[0];
+      timeString = timeFormat(times);
+    });
+  }
+
+  void timeStartStop() {
+    if (!running && times > 0) {
+      timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+        setState(() {
+          if (times <= 0) {
+            timer.cancel();
+          } else {
+            running = true;
+            times--;
+            timeString = timeFormat(times);
+          }
+        });
+      });
+    } else {
+      running = false;
+      timer.cancel();
+      setState(() {
+        timeString = timeFormat(times);
+      });
+    }
+  }
+
+  void timeReset() {
+    setState(() {
+      timer.cancel();
+      running = false;
+      timeString = '0:00:00';
+      times = 0;
     });
   }
 
@@ -90,16 +126,38 @@ class _MyAppState extends State<MyApp> {
                             fontWeight: FontWeight.bold),
                       ),
                     ))),
-            Flexible(
-                child: Container(
-              child: const IconButton(
-                  onPressed: null,
-                  icon: Icon(
-                    Icons.play_circle_outline_outlined,
-                    size: 40,
-                    color: Colors.pink,
-                  )),
-            ))
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                !running
+                    ? IconButton(
+                        iconSize: 100,
+                        alignment: Alignment.center,
+                        onPressed: timeStartStop,
+                        icon: const Icon(
+                          Icons.play_circle_outline_outlined,
+                          // size: 70,
+                          color: Colors.pink,
+                        ))
+                    : IconButton(
+                        iconSize: 100,
+                        onPressed: timeStartStop,
+                        icon: const Icon(
+                          Icons.pause_circle_outline_outlined,
+                          // size: 70,
+                          color: Colors.pink,
+                        )),
+                const SizedBox(width: 30),
+                IconButton(
+                    iconSize: 100,
+                    onPressed: timeReset,
+                    icon: const Icon(
+                      Icons.stop_circle_outlined,
+                      color: Colors.white,
+                      // size: 70,
+                    ))
+              ],
+            )
           ],
         ),
       ),
