@@ -18,6 +18,7 @@ class _MyAppState extends State<MyApp> {
   int times = 0;
   String timeString = '0:00:00';
   bool running = false;
+  bool enable = false;
 
   String timeFormat(int duration) {
     return Duration(seconds: times).toString().split('.')[0];
@@ -25,6 +26,7 @@ class _MyAppState extends State<MyApp> {
 
   void changeTime({required int second}) {
     times += second;
+    times = times < 0 ? 0 : times;
     setState(() {
       timeString = timeFormat(times);
     });
@@ -72,7 +74,7 @@ class _MyAppState extends State<MyApp> {
                 flex: 1,
                 child: Center(
                   child: Text(
-                    'My timer',
+                    'My Simple Timer',
                     style: TextStyle(fontSize: 30, color: Colors.white),
                   ),
                 )),
@@ -90,21 +92,21 @@ class _MyAppState extends State<MyApp> {
                           color: Colors.blue),
                     ),
                     GestureDetector(
-                      onTap: null,
+                      onTap: () => changeTime(second: 30),
                       child: const TimeButton(
                           icon: Icon(Icons.add_circle_outline),
                           second: '30',
                           color: Colors.cyan),
                     ),
                     GestureDetector(
-                      onTap: null,
+                      onTap: () => changeTime(second: -30),
                       child: const TimeButton(
                           icon: Icon(Icons.remove_circle_outline_rounded),
                           second: '30',
                           color: Colors.orange),
                     ),
                     GestureDetector(
-                      onTap: null,
+                      onTap: () => changeTime(second: -60),
                       child: const TimeButton(
                           icon: Icon(Icons.remove_circle_outline_rounded),
                           second: '60',
@@ -132,6 +134,7 @@ class _MyAppState extends State<MyApp> {
                 !running
                     ? IconButton(
                         iconSize: 100,
+                        disabledColor: Colors.grey,
                         alignment: Alignment.center,
                         onPressed: timeStartStop,
                         icon: const Icon(
@@ -180,7 +183,8 @@ class TimeButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+      decoration:
+          BoxDecoration(color: color, borderRadius: BorderRadius.circular(5)),
       child: Row(
         children: [icon, Text(second)],
       ),
